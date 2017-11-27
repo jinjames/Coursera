@@ -306,7 +306,13 @@ Works well when n is large | Slow if n is large |
 
 ## Classification and Representation
 
+### Classes
+1. **Negative class** $\rightarrow$ "0"
+2. **Positive class** $\rightarrow$ "1"
 
+### Classification Constraints
+1. **y = 0 or y = 1**
+2. **$h_{\theta}(x)$ can be >1 or <0**
 
 
 ## Solving the Problem of Overfitting
