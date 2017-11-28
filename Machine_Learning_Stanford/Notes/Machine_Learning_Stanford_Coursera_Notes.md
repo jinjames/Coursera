@@ -307,12 +307,119 @@ Works well when n is large | Slow if n is large |
 ## Classification and Representation
 
 ### Classes
-1. **Negative class** $\rightarrow$ "0"
-2. **Positive class** $\rightarrow$ "1"
+- In binary classification, there are two classes:
+    1. **Negative class** $\rightarrow$ "0"
+    2. **Positive class** $\rightarrow$ "1"
 
 ### Classification Constraints
-1. **y = 0 or y = 1**
-2. **$h_{\theta}(x)$ can be >1 or <0**
+- **For Linear Regression:** $h_{\theta}(x)\; can\; be >1\; or <0$
+- **For Logistic Regression:** $0 \leq h_{\theta}(x) \leq 1$
 
+### Threshold Classification
+- Assume Z = 0.5 (can be any value):
+  1. If $h_{\theta}(x)$ >= Z, predict y = 1
+  2. If $h_{\theta}(x)$ < Z, predict y = 0
+- **Very ineffective if there are outliers**
+
+### Logistic Regression
+
+#### Hypothesis
+- g(z) is the **logistic** or **sigmoid** function
+***
+``` math
+g(z) = \frac{1}{1 + e^{-z}}
+```
+``` math
+h_{\theta}(x) = g(\theta^Tx) = \frac{1}{1 + e^{-\theta^{T}x}}
+```
+***
+**Predict y = 1:**
+``` math
+h_{\theta}(x) \geq 0.5
+```
+``` math
+\theta^{T}x \geq 0
+```
+**Predict y = 0:**
+``` math
+h_{\theta}(x) \lt 0.5
+```
+``` math
+\theta^{T}x \lt 0
+```
+***
+
+#### Decision Boundary
+- Contour that separates the regions where the hypothesis predicts y = 0 and y = 1
+- It is a property of the hypothesis, **not** of the data set
+
+##### Calculations
+1. **The boundary is defined at:**
+Z = $\theta_{0} + \theta_{1}x_{1} + \theta_{2}x_{2} + ... = 0$
+
+2. **y = 0 when:**
+Z = $\theta_{0} + \theta_{1}x_{1} + \theta_{2}x_{2} + ... \lt 0$
+
+3. **y = 1 when:**
+Z = $\theta_{0} + \theta_{1}x_{1} + \theta_{2}x_{2} + ... + \geq 0$
+
+#### Cost Function
+***
+``` math
+J(\theta) = \frac{1}{m} \sum_{i = 1}^{m} Cost(h_{\theta}(x^{(i)}), y^{(i)})
+```
+``` math
+J(\theta) = -\frac{1}{m} [\sum_{i = 1}^{m} y^{(i)}logh_{\theta}(x^{(i)}) + (1 - y^{(i)})log(1 - h_{\theta}(x^{(i)}))]
+```
+**Vectorized:**
+``` math
+J(\theta) = \frac{1}{m} (-y^{T}log(h) - (1-y)^{T}log(1-h))
+```
+***
+``` math
+Cost(h_{\theta}(x), y) =  \begin{cases}
+      -log(h_{\theta}(x)) & if\, y = 1 \\
+      -log(1-h_{\theta}(x)) & if\, y = 0
+   \end{cases}
+```
+``` math
+Cost(h_{\theta}(x), y) = -ylog(h_{\theta}(x)) - (1-y)log(1-h_{\theta}(x))
+```
+***
+
+**If y = 0:**
+``` math
+If\; h_{\theta}(x) = 0: Cost = 0
+```
+``` math
+If\; h_{\theta}(x) \rightarrow 1: Cost \rightarrow \infty
+```
+**If y = 1:**
+``` math
+If\; h_{\theta}(x) = 1: Cost = 0
+```
+``` math
+If\; h_{\theta}(x) \rightarrow 0: Cost \rightarrow \infty
+```
+
+##### Convex Functions
+- The same global maximum can be found regardless of where gradient descent is started
+
+#### Gradient Descent
+- Cosmetically, equation looks identical to Linear Regression Gradient Descent - the difference is in the hypothesis
+***
+Repeat {
+``` math
+\theta_{j} := \theta_{j} - \alpha \sum_{i=1}^{m}(h_{\theta}(x^{(i)}) - y^{(i)}) \times x_{j}^{(i)}
+```
+}
+
+**Vectorized:**
+``` math
+\theta := \theta - \frac{\alpha}{m}X^{T}(g(X\theta) - \vec{y})
+```
+***
+
+## Multiclass Classification
 
 ## Solving the Problem of Overfitting
