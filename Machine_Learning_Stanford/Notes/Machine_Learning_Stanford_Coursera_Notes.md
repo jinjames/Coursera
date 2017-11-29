@@ -420,6 +420,109 @@ Repeat {
 ```
 ***
 
+#### Other Optimization Algorithms vs. Gradient Descent
+
+##### Algorithms
+1. Conjugate Gradient
+2. BFGS
+3. L-BFGS
+
+##### Comparison
+| Advantages | Disadvantages |
+| :---: | :---: |
+| - Don't need to pick $\alpha$ <br> - Typically faster than gradient descent | - More complex |
+
 ## Multiclass Classification
+- Value of y can be from any set of **discrete** values
+
+### One vs. All Algorithm
+- Train a logistic regression classifier $h_{\theta}^{(i)}(x)$ **for each class $i$** to predict the probability that $y = i$
+
+***
+``` math
+h_{\theta}^{(i)}(x) = P(y = i|x;\theta)\;\;\;\;\; (i = 1, 2, 3)
+```
+***
+
+- To make a prediction on a new input $x$, pick class $i$ that maximizes $h_{\theta}^{(i)}(x)$
 
 ## Solving the Problem of Overfitting
+
+### Underfit (High Bias)
+- Learned hypothesis does not fit the training set well, and thus also fails to fit new examples
+
+### Overfit (High Variance)
+- Learned hypothesis may fit the training set very well, but fails to generalize to new examples
+
+#### Addressing Overfitting
+1. Reduce number of features
+2. Regularization
+    - Useful when each parameter, $\theta_{j}$ has a small impact on the prediction
+
+### Regularization
+- Keep all features, but reduce magnitude of parameters, $\theta_{j}$
+- Creates a simpler hypothesis to address overfitting
+
+***
+``` math
+J(\theta) = \frac{1}{2m}[\sum_{i=1}^{m}(h_{\theta}(x^{(i)}) - y^{(i)})^2 + \lambda \sum_{i=1}^{n}\theta_{j}^2]
+```
+where $\lambda$ is the **regularization parameter**
+***
+
+- **If $\lambda$ is too large, there can be underfitting**, since each $\theta_{j} \rightarrow 0$
+
+### Regularized Linear Regression
+
+#### Gradient Descent
+**Note:** Below, $1 - \alpha \frac{\lambda}{m} \lt 1$
+
+***
+Repeat {
+``` math
+\theta_{0} := \theta_{0} - \alpha\frac{1}{m} \sum_{i=1}^{m}(h_{\theta}(x^{(i)}) - y^{((i))}) \times x_{0}^{(i)}
+```
+``` math
+\theta_{j} := \theta_{j}(1 - \alpha \frac{\lambda}{m}) - \alpha \frac{1}{m} \sum_{i=1}^{m}(h_{\theta}(x^{(i)}) - y^{(i)}) \times x_{j}^{(i)}
+```
+for j = 1, 2,...,n
+}
+***
+
+#### Normal Equation
+***
+``` math
+\theta = (X^{T}X + \lambda(M))^{-1} X^{T}y
+```
+where **M is a (n+1, n+1) matrix that has 1s on its diagonal, expect for the first index**
+
+e.g. If n = 2:
+
+ M = $\begin{matrix}
+    0 & 0 & 0 \\
+    0 & 1 & 0 \\
+    0 & 0 & 1
+\end{matrix}$
+***
+
+#### Non-Invertibility
+- Without regularization, if $m \leq n$, $X^{T}X$ is non-invertible and we cannot find $\theta$ using the normal equation
+
+- With regularization, if $m \leq n$ **and $\lambda \gt 0$**, $X^{T}X + \lambda(M)$ is still invertible and the normal equation can be used
+
+#### Cost Function
+***
+``` math
+J(\theta )= -[\frac{1}{m} \sum_{i=1}^{m} y^{(i)}logh_{\theta}(x^{(i)}) + (1-y^{(i)})log(1-h_{\theta}(x^{(i)}))] + \frac{\lambda}{2m} \sum_{j=1}^{n}\theta_{j}^2
+```
+for $\theta_{1}, \theta_{2}, ... , \theta{n}$
+***
+
+#### Gradients
+- For use in implementing the optimization algorithn in Octave
+
+***
+``` math
+\frac{\partial}{\partial\theta_{j}}J(\theta) = \frac{1}{m} \sum_{i=1}^{m}(h_{\theta}(x^{(i)}) - y^{(i)}) \times x_{j}^{(i)} + \frac{\lambda}{m}\theta_{j}
+```
+***
