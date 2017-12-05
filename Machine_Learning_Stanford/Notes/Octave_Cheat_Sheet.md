@@ -333,6 +333,12 @@
     end
     ```
 
+5. **Existence of a value**
+    Determine if the value 2 exists in the matrix A:
+    ```
+    any(A==2)
+    ```
+
 ## Functions
 1. **Defining a function**
     Define a function called "bar", which squares and cubes its argument "x" and returns the results as "first" and "second":
@@ -340,6 +346,12 @@
     function [first, second] = bar(x)
       first = x^2
       second = x^3
+    ```
+
+2. **Wrapping a function**
+    Create a function with argument t, which calls another function "myFunc":
+    ```
+    @(t)(myFunc(t, X, y))
     ```
 
 ## Miscellaneous

@@ -323,6 +323,8 @@ Works well when n is large | Slow if n is large |
 
 ### Logistic Regression
 
+**Note:** Logistic regression is a **linear qualifier** - it can only determine linear decision boundaries!
+
 #### Hypothesis
 - g(z) is the **logistic** or **sigmoid** function
 ***
@@ -526,3 +528,106 @@ for $\theta_{1}, \theta_{2}, ... , \theta{n}$
 \frac{\partial}{\partial\theta_{j}}J(\theta) = \frac{1}{m} \sum_{i=1}^{m}(h_{\theta}(x^{(i)}) - y^{(i)}) \times x_{j}^{(i)} + \frac{\lambda}{m}\theta_{j}
 ```
 ***
+
+### Points of Interest
+1. Adding a new feature **always** results in **equal or better** performance on the **training set**
+
+# Week 4
+
+## Motivations
+- Neural networks come into use when we need to fit a difficult data set with a hypothesis, but standard methods (e.g. multivariate linear regression) would require too many features
+    - i.e. With n features, **including just the quadratic terms (e.g. $x_i$$x_j$) would produce roughly $\frac{n^2}{2}$ features**
+
+## Neural Networks
+
+### Neurons in the Brain
+- Dendrite $\rightarrow$ "input wire"
+- Axon $\rightarrow$ "output wire"
+
+### Neuron Model: A Logistic Unit
+
+``` mermaid
+graph LR
+
+x0((x0)) --> node(( ))
+x1((x1)) --> node(( ))
+x2((x2)) --> node(( ))
+x3((x3)) --> node(( ))
+node(( )) --> hyp(("h(x)"))
+```
+
+- The $x_0$ term is called the **Bias Neuron/Unit** and is always 1
+
+### Terminology
+1. **Sigmoid (Logistic) Activation Function**
+    - Uses the logistic function
+
+2. **Weights**
+    - Parameters ($\theta$)
+
+3. **Input Layer**
+    - The first layer
+
+4. **Output Layer**
+    - The last layer
+
+5. **Hidden Layer**
+    - Any layer that is not the input or output
+
+### Notation
+1. **$a_{i}^{(j)}$**
+    - "Activation" of unit $i$ in layer $j$
+
+2. **$\theta^{(j)}$**
+    - Matrix of weights controlling function mapping from layer $j$ to layer $j+1$
+
+### Neural Network Example
+``` mermaid
+graph LR
+
+x1((x1)) --> a1(("a1(2)"))
+x1 --> a2
+x1 --> a3
+x2((x2)) --> a2(("a2(2)"))
+x2 --> a1
+x2 --> a3
+x3((x3)) --> a3(("a3(2)"))
+x3 --> a1
+x3 --> a2
+a1 --> out((" "))
+a2 --> out
+a3 --> out
+out --> hyp(("h(x)"))
+```
+
+- Contains:
+    1. **Layer 1: Input layer**
+        - 3 units
+    2. **Layer 2: Hidden layer**
+        - 3 hidden units
+    3. **Layer 3: Output layer**
+        - 1 unit
+
+***
+- The activation values are:
+``` math
+a_{1}^{(2)} = g(\theta_{10}^{(1)}x_{0} + \theta_{11}^{(1)}x_{1} + \theta_{12}^{(1)}x_{2} + \theta_{13}^{(1)}x_{3})
+```
+``` math
+a_{2}^{(2)} = g(\theta_{20}^{(1)}x_{0} + \theta_{21}^{(1)}x_{1} + \theta_{22}^{(1)}x_{2} + \theta_{23}^{(1)}x_{3})
+```
+``` math
+a_{3}^{(2)} = g(\theta_{30}^{(1)}x_{0} + \theta_{31}^{(1)}x_{1} + \theta_{32}^{(1)}x_{2} + \theta_{33}^{(1)}x_{3})
+```
+
+- The hypothesis value is:
+``` math
+h_{\theta}(x) = a_{1}^{(3)} = g(\theta_{10}^{(2)}a_{0}^{(2)} + \theta_{11}^{(2)}a_{1}^{(2)} + \theta_{12}^{(2)}a_{2}^{(2)} + \theta_{13}^{(2)}a_{3}^{(2)})
+```
+***
+
+### Points of Interest
+- **Note:** If a network has $s_{j}$ units in layer $j$, $s_{j+1}$ units in layer $j + 1$, then $\theta^{(j)}$ will have dimension $(s_{j+1}) \times (s_{j} + 1)$
+
+
+## Applications
