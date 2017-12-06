@@ -164,11 +164,11 @@ temp1 := \theta_{1} - \alpha \frac{\partial}{\partial\theta_{1}}J(\theta_{0}, \t
 3. **Identity Matrix, $I_{nxn}$**
     e.g. $I_{3x3}$:
     ``` math
-    \begin{matrix}
+    \begin{bmatrix}
         1 & 0 & 0 \\
         0 & 1 & 0 \\
         0 & 0 & 1
-    \end{matrix}
+    \end{bmatrix}
     ```
 
     **For any $I_{nxn}$:**
@@ -500,11 +500,11 @@ where **M is a (n+1, n+1) matrix that has 1s on its diagonal, expect for the fir
 
 e.g. If n = 2:
 
- M = $\begin{matrix}
+ M = $\begin{bmatrix}
     0 & 0 & 0 \\
     0 & 1 & 0 \\
     0 & 0 & 1
-\end{matrix}$
+\end{bmatrix}$
 ***
 
 #### Non-Invertibility
@@ -581,7 +581,9 @@ node(( )) --> hyp(("h(x)"))
 2. **$\theta^{(j)}$**
     - Matrix of weights controlling function mapping from layer $j$ to layer $j+1$
 
-### Neural Network Example
+### Forward Propagation
+
+#### Example
 ``` mermaid
 graph LR
 
@@ -609,25 +611,78 @@ out --> hyp(("h(x)"))
         - 1 unit
 
 ***
-- The activation values are:
+- The **z values** are (in vectorized form):
 ``` math
-a_{1}^{(2)} = g(\theta_{10}^{(1)}x_{0} + \theta_{11}^{(1)}x_{1} + \theta_{12}^{(1)}x_{2} + \theta_{13}^{(1)}x_{3})
+z^{(2)} = \theta^{(1)} \times a^{(1)}
 ```
 ``` math
-a_{2}^{(2)} = g(\theta_{20}^{(1)}x_{0} + \theta_{21}^{(1)}x_{1} + \theta_{22}^{(1)}x_{2} + \theta_{23}^{(1)}x_{3})
+z^{(3)} = \theta^{(2)} \times a^{(2)}
+```
+***
+- The **activation values** are:
+``` math
+a_{1}^{(2)} = g(z_{1}^{(2)}) = g(\theta_{10}^{(1)}x_{0} + \theta_{11}^{(1)}x_{1} + \theta_{12}^{(1)}x_{2} + \theta_{13}^{(1)}x_{3})
 ```
 ``` math
-a_{3}^{(2)} = g(\theta_{30}^{(1)}x_{0} + \theta_{31}^{(1)}x_{1} + \theta_{32}^{(1)}x_{2} + \theta_{33}^{(1)}x_{3})
+a_{2}^{(2)} = g(z_{2}^{(2)}) = g(\theta_{20}^{(1)}x_{0} + \theta_{21}^{(1)}x_{1} + \theta_{22}^{(1)}x_{2} + \theta_{23}^{(1)}x_{3})
 ```
-
-- The hypothesis value is:
 ``` math
-h_{\theta}(x) = a_{1}^{(3)} = g(\theta_{10}^{(2)}a_{0}^{(2)} + \theta_{11}^{(2)}a_{1}^{(2)} + \theta_{12}^{(2)}a_{2}^{(2)} + \theta_{13}^{(2)}a_{3}^{(2)})
+a_{3}^{(2)} = g(z_{3}^{(2)}) = g(\theta_{30}^{(1)}x_{0} + \theta_{31}^{(1)}x_{1} + \theta_{32}^{(1)}x_{2} + \theta_{33}^{(1)}x_{3})
+```
+- **Note:** $a^{(2)}$ should be 4 terms long, since there is also a $a_{0}^{(2)}$, which is not shown here
+***
+- The **hypothesis value** is:
+``` math
+h_{\theta}(x) = a_{1}^{(3)} = g(z^{(3)}) =  g(\theta_{10}^{(2)}a_{0}^{(2)} + \theta_{11}^{(2)}a_{1}^{(2)} + \theta_{12}^{(2)}a_{2}^{(2)} + \theta_{13}^{(2)}a_{3}^{(2)})
 ```
 ***
 
 ### Points of Interest
 - **Note:** If a network has $s_{j}$ units in layer $j$, $s_{j+1}$ units in layer $j + 1$, then $\theta^{(j)}$ will have dimension $(s_{j+1}) \times (s_{j} + 1)$
 
-
 ## Applications
+
+### Hypothesis Functionality
+- Can determine the functionality of a hypothesis by creating its truth table
+
+#### Process
+This example is for logical NOR:
+1. **Write out hypothesis**
+    $h_{\theta}(x) = g(10 - 20x_{1})$
+
+2. **Calculate hypothesis value for the different possible permutations of the features**
+    | $x_{1}$ | $h_{\theta}(x)$ |
+    | :---: | :---: |
+    | 0 | g(10) = 1 |
+    | 1 | g(-10) = 0 |
+
+### Multiclass Classification Neural Networks
+
+#### Output Neurons
+- With $n$ possible outputs, there must be **$n$ output neurons** (one for each possible output)
+
+#### Output Vector, $y$
+- $y$ will be a **column vector of size $n$**, where **one element has a value of one** and the **rest are zero**
+e.g. With 3 possible outputs, y will be one of:
+``` math
+\begin{bmatrix}
+    1 \\
+    0 \\
+    0
+\end{bmatrix}
+
+\begin{bmatrix}
+    0 \\
+    1 \\
+    0
+\end{bmatrix}
+
+\begin{bmatrix}
+    0 \\
+    0 \\
+    1
+\end{bmatrix}
+```
+
+#### Hypothesis, $h_{\theta}(x)$
+- Ideally our hypothesis would be the same as $y$, in that it would be a **column vector of size $n$**, where **one element has a value of one** and the **rest are zero**
