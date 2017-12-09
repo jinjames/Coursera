@@ -141,11 +141,11 @@ temp1 := \theta_{1} - \alpha \frac{\partial}{\partial\theta_{1}}J(\theta_{0}, \t
 4. **Dimension**
     - Number of rows * number of columns
 
-#### Addition and subtraction
+#### Addition and Subtraction
 - Element-wise
 - Operands' dimensions must be the same
 
-#### Scalar multiplication and division
+#### Scalar Multiplication and Division
 - Perform multiplication or division on every element by the scalar value
 
 #### Matrix multiplication
@@ -174,6 +174,12 @@ temp1 := \theta_{1} - \alpha \frac{\partial}{\partial\theta_{1}}J(\theta_{0}, \t
     **For any $I_{nxn}$:**
     ``` math
     A \times I = I \times A = A
+    ```
+
+4. **Multiplication by transpose**
+    - If $a$ and $b$ are both vectors:
+    ``` math
+    a^{T}b = b^{T}a
     ```
 
 ##### Dimension Requirements
@@ -581,7 +587,7 @@ node(( )) --> hyp(("h(x)"))
 2. **$\theta^{(j)}$**
     - Matrix of weights controlling function mapping from layer $j$ to layer $j+1$
 
-### Forward Propagation
+### Computing the Hypothesis: Forward Propagation
 
 #### Example
 ``` mermaid
@@ -620,6 +626,9 @@ z^{(3)} = \theta^{(2)} \times a^{(2)}
 ```
 ***
 - The **activation values** are:
+``` math
+a^{(l)} = g(\theta^{(l-1)} \times a^{(l-1)})
+```
 ``` math
 a_{1}^{(2)} = g(z_{1}^{(2)}) = g(\theta_{10}^{(1)}x_{0} + \theta_{11}^{(1)}x_{1} + \theta_{12}^{(1)}x_{2} + \theta_{13}^{(1)}x_{3})
 ```
@@ -686,3 +695,100 @@ e.g. With 3 possible outputs, y will be one of:
 
 #### Hypothesis, $h_{\theta}(x)$
 - Ideally our hypothesis would be the same as $y$, in that it would be a **column vector of size $n$**, where **one element has a value of one** and the **rest are zero**
+
+# Week 5
+
+## Cost Function and Back Propagation
+
+### Terminology
+1. **$L$**
+    - Total number of layers in network
+
+2. **$s_{l}$**
+    - Number of units (not counting the bias unit) in layer $l$
+
+3. **$K$**
+    - Number of units in the output layer
+
+### Cost Function
+- Note that in the equation below, the indices **start at 1, not 0**, since we do not want to consider the bias unit
+***
+``` math
+J(\theta) = -\frac{1}{m} [\sum_{i=1}^{m} \sum_{k=1}^{K}y_{k}^{(i)} log(h_{\theta}(x^{(i)}))_{k} + (1-y_{k}^{(i)})log(1-(h_{\theta}(x^{(i)}))_{k})] + \frac{\lambda}{2m} \sum_{l}^{L-1} \sum_{i=1}^{s_{l}} \sum_{j=1}^{s_{l+1}} (\theta_{ji}^{l})^{2}
+```
+***
+
+### Gradient Computation: Backpropagation
+- An algorithm to help minimize the cost function by computing the gradients
+
+#### Single Example
+
+1. **Delta, $\delta_{j}^{(l)}$**
+
+    ##### Definition
+    - Informally: "Error" of node $j$ in layer $l$
+    - Formally: $\delta_{j}^{(l)} = \frac{\partial}{\partial z_{j}^{(l)}}cost(i)$, for $j \geq 0$,
+      where cost(i) = $y^{(i)}logh_{\theta}(x^{(i)}) + (1-y^{(i)})logh_{\theta}(x^{(i)})$
+
+    ##### Points of Note
+    - $\delta^{(1)}$ **does not exist**
+    - For any $l$, $\delta_{0}^{(l)}$ = 1. **Ignore and do not use these values**
+
+    - For each **output** layer:
+    ***
+    ``` math
+    \delta_{j}^{(l)} = a_{j}^{(l)} - y_{j} = h_{\theta}(x)_{j} - y_{j}
+    ```
+
+    or in **vectorized** form:
+
+    ``` math
+    \delta^{(l)} = a^{(l)} - y = h_{\theta}(x) - y
+    ```
+    ***
+
+    - For **all other layers except $l$ = 1**:
+    ***
+    ``` math
+    \delta^{l} = (\theta^{(l)})^{T}\delta^{(l+1)} .* g'(z^{(l)})
+    ```
+    where
+    ``` math
+    g'(z^{(l))}) = a^{(l)} .* (1-a^{(l)})
+    ```
+    ***
+
+2. **Gradient,  $\frac{\partial}{\partial\theta_{ij}^{(l)}} J(\theta)$**
+    - The equation below **is only valid** if $\lambda = 0$ (no regularization)
+    ***
+    ``` math
+    \frac{\partial}{\partial\theta_{ij}^{(l)}} J(\theta) = a_{j}^{(l)}\delta_{j}^{(l+1)}
+    ```
+    ***
+
+#### Multiple Examples
+
+***
+1. **Set $\Delta_{ij}^{(l)} = 0$ for all (l, i, j)**
+2. **For all examples, i = 1 to m:**
+    1. Forward propagate to compute $a^{(i)}$ for $l = 1,2,...,L$
+    2. Using $y^{(i)}$, compute $\delta^{(L)} = a^{(L)} - y^{(i)}$
+    3. Compute $\delta^{(L-1)}, \delta^{L-2},...,\delta^{(2)}$
+    4. Compute
+        $\Delta_{ij}^{(l)} := \Delta_{ij}^{(l)} + a_{j}^{(l)}\delta_{i}^{(l+1)}$
+        or **vectorized:**
+        $\Delta^{(l)} := \Delta^{(l)} + \delta^{(l+1)}(a^{(l)})^{T}$
+    5. Compute
+    ``` math
+    \frac{\partial}{\partial\theta_{ij}^{(l)}}
+    J(\theta) = D_{ij}^{(l)} =   
+       \begin{cases}
+          \frac{1}{m} \Delta_{ij}^{(l)} + \lambda\theta_{ij}^{(l)} & if\, j \neq 0 \\
+          \frac{1}{m} \Delta_{ij}^{(l)} & if\, j = 0
+       \end{cases}
+    ```
+***
+
+## Backpropagation in Practice
+
+### 
