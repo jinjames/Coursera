@@ -711,7 +711,9 @@ e.g. With 3 possible outputs, y will be one of:
     - Number of units in the output layer
 
 ### Cost Function
-- Note that in the equation below, the indices **start at 1, not 0**, since we do not want to consider the bias unit
+- **Note:** For a neural network, **$J(\theta)$ is non-convex** and thus **can get stuck in local optima**
+    - However, typically most algorithms are good enough at minimizing $J(\theta)$
+- In the equation below, the indices **start at 1, not 0**, since we do not want to consider the bias unit
 ***
 ``` math
 J(\theta) = -\frac{1}{m} [\sum_{i=1}^{m} \sum_{k=1}^{K}y_{k}^{(i)} log(h_{\theta}(x^{(i)}))_{k} + (1-y_{k}^{(i)})log(1-(h_{\theta}(x^{(i)}))_{k})] + \frac{\lambda}{2m} \sum_{l}^{L-1} \sum_{i=1}^{s_{l}} \sum_{j=1}^{s_{l+1}} (\theta_{ji}^{l})^{2}
@@ -791,4 +793,81 @@ J(\theta) = -\frac{1}{m} [\sum_{i=1}^{m} \sum_{k=1}^{K}y_{k}^{(i)} log(h_{\theta
 
 ## Backpropagation in Practice
 
-### 
+### Unrolling and Rolling Parameters
+1. Start with initial parameters: $\theta{(1)}, \theta{(2)}, \theta{(3)}$
+2. Unroll theta parmeters to get initialTheta to pass to fminunc(@costfunction, initialTheta, options)
+3. Create ```function [jval, gradientVec] = costFunction(thetaVec)```:
+    1. From thetaVec, get $\theta{(1)}, \theta{(2)}, \theta{(3)}$
+    2. Use forward and back propagation to compute $D^{(1)}, D^{(2)}, D^{(3)} and J(\theta)$
+    3. Unroll $D^{(1)}, D^{(2)}, D^{(3)}$ to get gradientVec
+
+### Gradient Checking: Numerical Estimation of Gradients
+
+#### Purpose
+- Used to calculate the slope at the desired point and to confirm if a backpropagation solution was correctly implemented
+- Compare the gradients below with the gradient generated from backpropagation to check algorithm accuracy
+- Ensure gradient checking is off during algorithm training, as it performs very slowly
+
+#### $\theta$ is a Real Number
+***
+``` math
+\frac{\partial}{\partial\theta}J(\theta) = \frac{J(\theta + \epsilon) - J(\theta - \epsilon)}{2\epsilon}
+```
+, where $\epsilon = 10^{-4}$
+***
+
+#### $\theta$ is a Vector
+***
+``` math
+\frac{\partial}{\partial\theta_{n}} J(\theta) = \frac{J(\theta_{1},\theta_{2},...,\theta{n+\epsilon}) - J(\theta_{1}, \theta_{2},...,\theta_{n-\epsilon})}{2\epsilon}
+```
+***
+
+### Theta Initialization
+
+#### Zero Initialization (Symmetrical Weights)
+- **Does not work,** since all hidden layer activation values will start at the same value zero
+- Even after an iteration of gradient descent, the values still remain the same (e.g. $a^{(1)}_{1} == a^{(1)}_{2}$)
+
+#### Random Initialization (Symmetry Breaking)
+- Initialize each $\theta_{ij}^{(l)}$ to a random value in [$-\epsilon, \epsilon$]
+**e.g.**
+``` math
+\theta^{(1)} = rand(1,3) * (2*EPSILON) - (EPSILON)
+```
+
+### Creating a Neural Network
+
+***
+#### Pick a Network Architecture
+1. **Number of input units**
+    - Dimension of features $x^{(i)}$
+2. **Number of output units**
+    - Number of classes
+3. **Number of hidden layers**
+    - Default: Use **one** hidden layer
+    - If using more than one hidden layer, use the same number of hidden units in each layer
+    - Typically, having more units in a hidden layer is better
+
+#### Train the Neural Network
+1. Randomly initialize the weights
+2. Implement forward propagation to get $h_{\theta}(x^{(i)}) for any x^{(i)}
+3. Compute cost function, $J(\theta)$
+4. Implement backward propagation to compute partial derivatives $\frac{\partial}{\partial\theta_{jk}^{(l)}}J(\theta)$
+
+
+**In practice, this might look like:**
+  **for i = 1:m {**
+        **a.** Perform forward propagation and backward propagation using $(x^{(i)}, y^{(i)})$
+        **b.** Compute activations, $a^{(l)}$, for $l = 2,..,L$
+        **c.** Compute delta terms, $\delta^{(l)}$, for $l = 2,...,L$
+        **d.** Compute $\Delta^{(l)} = \Delta^{(l)} + \delta^{(l+1)}(a^{(l)})^T$
+    **}**
+        **e.** Compute $\frac{\partial}{\partial\theta_{jk}^{(l)}}J(\theta)$
+
+5. Use gradient checking to compare $\frac{\partial}{\partial\theta_{jk}^{(l)}}J(\theta)$ using back propagation and numerical estimation of the gradient
+6. Disable gradient checking
+7. Implement an optimization algorithm (e.g. gradient descent) with back propagation (which calculates the partial derivatives) to minimize $J(\theta)$ as a function of $\theta$
+***
+
+# Week 6

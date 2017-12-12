@@ -37,6 +37,10 @@
     ```
     randn(1,3)
     ```
+    To create a 1x3 matrix, E with random values between $-\epsilon$ and $\epsilon$:
+    ```
+    rand(1,3) * (2*EPSILON) - (EPSILON)
+    ```
 
 5. **Generate the identity matrix**
     To create the 3x3 identity matrix:
@@ -45,9 +49,21 @@
     ```
 
 6. **Assign values to one row**
-    To assign the second columnof matrix X to a specified vector:
+    To assign the second column of matrix X to a specified vector:
     ```
     X(:, 2) = [10; 11; 12]
+    ```
+
+7. **Unrolling matrices**
+    To unroll matrices X1 and X2 into a vector, y:
+    ```
+    y = [X1(:); X2(:)]
+    ```
+
+8. **Reshaping matrices**
+    To assign Theta1 to the first 110 elements of thetaVec (as a 10x11 matrix):
+    ```
+    Theta1 = reshape(thetaVec(1:110), 10, 11)
     ```
 
 ### Access
